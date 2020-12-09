@@ -57,6 +57,24 @@ def NewAnalizer():
         error.reraise(exp, 'model:newAnalyzer')
     
 # Funciones para agregar informacion al grafo
+def loadTrips(taxis):
+
+    for taxi_file in os.listdir(cf.data_dir):
+        if taxis_file.endswith('.csv'):
+            print('Cargando archivo: ' + taxis_file)
+            loadFile(taxis,taxis_file)
+    return taxis 
+
+
+def loadFile(taxis, taxis_file):
+    
+    tripfile = cf.data_dir + taxis_file
+    input_file = csv.DictReader(open(tripfile, encoding='utf-8'), delimiter=',')
+    for trip in input_file:
+        model.addTrip(taxis, trip)
+    return taxis
+
+
 
 # ==============================
 # Funciones de consulta
