@@ -27,6 +27,9 @@
 import config as cf
 from App import model
 import csv
+import os 
+from DISClib.Algorithms.Graphs import scc
+
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -50,6 +53,22 @@ def init():
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
+def loadTrips(taxis):
+
+    for taxis_file in os.listdir(cf.data_dir):
+        if taxis_file.endswith('.csv'):
+            print('Cargando archivo: ' + taxis_file)
+            loadFile(taxis,taxis_file)
+    return taxis 
+
+
+def loadFile(taxis, taxis_file):
+    
+    tripfile = cf.data_dir + taxis_file
+    input_file = csv.DictReader(open(tripfile, encoding='utf-8'), delimiter=',')
+    for trip in input_file:
+        model.addTrip(taxis, trip)
+    return taxis
 
 # ___________________________________________________
 #  Funciones para consultas
