@@ -43,11 +43,43 @@ operación seleccionada.
 #  Variables
 # ___________________________________________________
 
+taxis_file ='\\Data'
 
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
 
+def printMenu():
+    print("\n")
+    print("*******************************************")
+    print("Bienvenido")
+    print("1- Inicializar Analizador")
+    print("2- Cargar información de taxis")
+    print(" ")
+    print("0- Salir")
+    print("*******************************************")
+
 """
 Menu principal
 """
+
+while True:
+    printMenu()
+    inputs = input('Seleccione una opción para continuar\n>')
+
+    if int(inputs[0]) == 1:
+        print("\nInicializando....")
+        # cont es el controlador que se usará de acá en adelante
+        analyzer = controller.init()
+
+    elif int(inputs[0]) == 2:
+        executiontime = timeit.timeit(optionTwo, number=1)
+        print("Tiempo de ejecución: " + str(executiontime))
+
+    elif int(inputs[0]) == 3:
+        executiontime = timeit.timeit(optionThree, number=1)
+        print("Tiempo de ejecución: " + str(executiontime))
+
+    else:
+        sys.exit(0)
+sys.exit(0)

@@ -40,7 +40,12 @@ recae sobre el controlador.
 #  Inicializacion del catalogo
 # ___________________________________________________
 
-
+def init():
+    """
+    Llama la funcion de inicializacion  del modelo.
+    """
+    taxis = model.newAnalyzer()
+    return taxis
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos

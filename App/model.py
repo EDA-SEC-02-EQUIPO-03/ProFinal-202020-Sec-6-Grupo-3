@@ -41,7 +41,21 @@ de creacion y consulta sobre las estructuras de datos.
 # -----------------------------------------------------
 #                       API
 # -----------------------------------------------------
+def NewAnalizer():
 
+    try:
+        taxis = {
+                    '': None,
+                    '': None,
+                    '': None,
+                    '': None
+                    }
+
+    
+        return taxis
+    except Exception as exp:
+        error.reraise(exp, 'model:newAnalyzer')
+    
 # Funciones para agregar informacion al grafo
 
 # ==============================
@@ -55,3 +69,13 @@ de creacion y consulta sobre las estructuras de datos.
 # ==============================
 # Funciones de Comparacion
 # ==============================
+def compare(x1, x2):
+    """
+    Compara dos elementos
+    """
+    if (x1 == x2):
+        return 0
+    elif (x1 > x2):
+        return 1
+    else:
+        return -1
