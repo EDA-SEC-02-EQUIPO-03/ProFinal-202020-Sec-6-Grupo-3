@@ -93,6 +93,11 @@ def optionThree():
                 print(str(f)+".  "+str(i)+": "+str(x))
                 f+=1
     
+def optionFour():
+    print("\nParte C")
+    station1=int(input("numero de la community area de salida: "))
+    station2=int(input("numero de la community area de destimo: "))
+
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n>')
