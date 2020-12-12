@@ -28,9 +28,11 @@ from DISClib.ADT.graph import gr
 from DISClib.ADT import minpq as mpq
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
+from DISClib.ADT import minpq 
 from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
+from DISClib.DataStructures import edge as ed
 from DISClib.Utils import error as error
 assert config
 
@@ -47,15 +49,18 @@ def newAnalyzer():
     try:
         taxis = {
                 'theServices': None,
-                    '': None,
-                    '': None,
-                    '': None
+                    'grafos': None
+                    
                     }
         taxis['theServices']=m.newMap(numelements=1000,
                                      maptype='PROBING',
                                      comparefunction=compareCompanies)
-
-    
+        taxis['grafos']=gr.newGraph(datastructure='ADJ_LIST',
+                        directed=True,
+                        size=1000,
+                        comparefunction=compareCompanies)
+        
+        
         return taxis
     except Exception as exp:
         error.reraise(exp, 'model:newAnalyzer')
@@ -88,6 +93,51 @@ def addCompany(theServices,company,taxiID):
     m.put(theServices,company,value)
     return theServices
 
+def getentry(entry,hour):
+    try:
+        Start=entry['pickup_community_area']
+        Finish=entry['dropoff_community_area']
+        timehour= int(hour[0,1])*60
+        timemin= (int(hour[2,3])//15)*15
+        timestamp=timehour+timemin
+        Start_entry=Start+str(timestamp)
+        Finish_entry=Finish+str(timestamp)
+        return Start_entry,Finish_entry
+    except Exception as exp:
+        error.reraise(exp, 'model:getentry')
+
+def addgraph(Analyzer,entry):
+    hour=getDateTimeTaxiTrip(entry)[1]
+    entries=getentry(entry,hour)
+    if entry['trip_seconds']!=None:
+        duration=round(int(entry['trip_seconds'])/60,2)
+    if entries[0]!=entries[1]:
+
+        addStation(Analyzer,entries[0])
+        addStation(Analyzer,entries[0])
+        addConnection (Analyzer, entries[0], entries[1], duration)
+
+def addStation(Analyzer, entry):
+    """
+    Adiciona una estación como un vertice del grafo
+    """
+    try:
+        if not gr.containsVertex(Analyzer['grafos'], entry):
+            gr.insertVertex(Analyzer['grafos'], entry)
+        return Analyzer
+    except Exception as exp:
+        error.reraise(exp, 'model:addStation')
+
+def addConnection(Analyzer, origin, destination, duration):
+    """
+    Adiciona un arco entre dos estaciones
+    """
+    edge = gr.getEdge(Analyzer['grafos'], origin, destination)
+    if edge is None:
+        gr.addEdge(Analyzer['grafos'], origin, destination, duration)
+    else:
+        ed.averageWeight(edge,duration)
+    return Analyzer
 
 
 # ==============================
@@ -102,7 +152,7 @@ def topN(theServices,N):
     values=m.valueSet(theServices)
     itv=it.newIterator(values)
     itk=it.newIterator(keys)
-    orden=mpq.newMinPQ(comparemax)
+    orden=mpq.newMinPQ(comparemaxpq)
     while it.hasNext(itv):
         value=it.next(itv)
         key= it.next(itk)
@@ -134,7 +184,7 @@ def topM(theServices,M):
     values=m.valueSet(theServices)
     itv=it.newIterator(values)
     itk=it.newIterator(keys)
-    orden=mpq.newMinPQ(comparemax)
+    orden=mpq.newMinPQ(comparemaxpq)
     while it.hasNext(itv):
         valu=it.next(itv)
         key= it.next(itk)
@@ -179,20 +229,55 @@ def allTaxisCompanies(theServices):
     num_taxis=lt.size(taxis)
     t=(num_taxis,companies)
     return t
+
+def theBestRoute(graph,station1,station2,timemin,timemax):
+    best=None
+    bestpath=None
+    besttime=100000
+    timemax=timechange(timemax)
+    timemin=timechange(timemin)
+    i=timemin
+    while i<=timemax:
+        
+        stationstart=station1+str(i)
+        stationend=station2+str(i)
+        best=djk.Dijkstra(graph,stationstart)
+        wa=djk.pathTo(best,stationend)
+        y=djk.distTo(best,stationend)
+        if wa!=None:
+            if best<=y:
+                besttime=y
+                best =i
+                bestpath= wa
+        i+=15
+    best=timechangeback(best)
+    way=[best,bestpath,besttime]
+    return way 
+
+
 # ==============================
 # Funciones Helper
 # ==============================
-
+def timechange(hour):
+    timehour= int(hour[0,1])*60
+    timemin= (int(hour[2,3])//15)*15
+    timestamp=timehour+timemin
+    return timestamp
+def timechangeback(timestamp):
+    timehour=timestamp//60
+    timemin=timestamp%60
+    hour=str(timehour)+":"+str(timemin)
+    return hour
 # ==============================
 # Funciones de Comparacion
 # ==============================
-def comparemax(x1, x2):
+def compare(x1, x2):
     """
     Compara dos elementos
     """
     if (x1 == x2):
         return 0
-    elif (x1 < x2):
+    elif (x1 > x2):
         return 1
     else:
         return -1
@@ -209,13 +294,14 @@ def compareCompanies(c1, ser2):
     else:
         return -1
 
-def compare(x1, x2):
+
+def comparemaxpq(x1, x2):
     """
     Compara dos elementos
     """
     if (x1 == x2):
         return 0
-    elif (x1 > x2):
-        return 1
-    else:
+    elif (x1 < x2):
         return -1
+    else:
+        return 1

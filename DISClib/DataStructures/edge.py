@@ -48,6 +48,16 @@ def weight(edge):
     Retorna el peso de un arco
     """
     return edge['weight']
+    
+def averageWeight(edge, weight):
+    """
+    Actualiza el peso del arco
+    """
+    new=(edge['weight']*edge['count']+ weight)/(edge['count']+1)
+    edge['weight'] = new
+    edge['count'] += 1
+    return edge['weight']
+
 
 
 def either(edge):
