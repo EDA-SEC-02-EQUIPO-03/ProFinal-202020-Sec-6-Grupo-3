@@ -51,9 +51,7 @@ def NewAnalizer():
                     'grafos': None
                     }
         taxis['grafos']=gr.newGraph('ADJ_LIST',True,1000,)
-        for i in range(0,69)
-            x=gr.newGraph('ADJ_LIST',True,1000,)
-            taxis['grafos']
+        
         
         return taxis
     except Exception as exp:
@@ -71,7 +69,7 @@ def getDateTimeTaxiTrip(taxitrip):
     taxitripdatetime = datetime.datetime.strptime(tripstartdate, '%Y-%m-%dT%H:%M:%S.%f')
     return taxitripdatetime.date(), taxitripdatetime.time()
 
-def getentry(entry):
+def getentry(entry,hour):
     try:
         Start=entry['pickup_community_area']
         Finish=entry['dropoff_community_area']
@@ -86,7 +84,7 @@ def getentry(entry):
 
 def addgraph(Analyzer,entry):
     hour=getDateTimeTaxiTrip(entry)[1]
-    entries=getentry(entry)
+    entries=getentry(entry,hour)
     if entry['trip_seconds']!=None:
         duration=round(int(entry['trip_seconds'])/60,2)
     if entries[0]!=entries[1]:
@@ -140,9 +138,10 @@ def theBestRoute(graph,station1,station2,timemin,timemax):
         if wa!=None:
             if best<=y:
                 besttime=y
-                best =time
+                best =i
                 bestpath= wa
         i+=15
+    best=timechangeback(best)
     way=[best,bestpath,besttime]
     return way 
 
