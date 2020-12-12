@@ -53,23 +53,27 @@ def init():
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
-def loadTrips(taxis):
+def loadData(analyzer, taxisfile):
+    """
+    Carga los datos de los archivos CSV en el modelo
+    """
+    taxisfile = cf.data_dir + taxisfile
+    input_file = csv.DictReader(open(taxisfile, encoding="utf-8"),
+                                delimiter=",")
 
-    for taxis_file in os.listdir(cf.data_dir):
-        if taxis_file.endswith('.csv'):
-            print('Cargando archivo: ' + taxis_file)
-            loadFile(taxis,taxis_file)
-    return taxis 
-
-
-def loadFile(taxis, taxis_file):
-    
-    tripfile = cf.data_dir + taxis_file
-    input_file = csv.DictReader(open(tripfile, encoding='utf-8'), delimiter=',')
-    for trip in input_file:
-        model.addTrip(taxis, trip)
-    return taxis
+    for taxi in input_file:
+        model.addService(analyzer, taxi)
+ 
+    return analyzer
 
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+def topN(analyzer,N):
+    return model.topN(analyzer['theServices'],N)
+
+def topM(analyzer,M):
+    return model.topM(analyzer['theServices'],M)
+
+def allTaxisCompanies(analyzer):
+    return model.allTaxisCompanies(analyzer['theServices'])

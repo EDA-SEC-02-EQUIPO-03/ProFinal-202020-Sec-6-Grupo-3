@@ -43,7 +43,6 @@ operación seleccionada.
 #  Variables
 # ___________________________________________________
 
-taxis_file ='\\Data'
 
 # ___________________________________________________
 #  Menu principal
@@ -55,14 +54,45 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar Analizador")
     print("2- Cargar información de taxis")
-    print(" ")
+    print("3- Parte A ")
+    print("4- Parte C ")
     print("0- Salir")
     print("*******************************************")
+# ___________________________________________________
+#  Opciones
+# ___________________________________________________
 
-"""
-Menu principal
-"""
+def optionTwo():
+    print("\nCargando información de taxis ....")
+    size=str(input("Tamaño del archivo (small, medium, large) : "))
+    taxisfile=str('taxi-trips-wrvz-psew-subset-'+ size +'.csv')
+    controller.loadData(analyzer,taxisfile)
+    print("\nCargado con éxito !! ")
 
+def optionThree():
+    print("\nParte A")
+    N=int(input("¿De qué cantidad desea el Top de compañías que más servicios prestaron? : "))
+    M=int(input("¿De qué cantidad desea el Top de compañías que más taxis afiliados tiene ? : "))
+    num_taxis_comp=controller.allTaxisCompanies(analyzer)
+    print("El número total de taxis en los servicios reportados es:",num_taxis_comp[0])
+    print("El número total de compañías que tienen al menos un taxi inscrito es: ",num_taxis_comp[1])
+    print(" ")
+    topN=controller.topN(analyzer,N)
+    print("TOP #. Company: #Services")
+    n=1
+    for x,y in topN.items():
+            for i in y:
+                print(str(n)+".  "+str(i)+": "+str(x))
+                n+=1
+    topM=controller.topM(analyzer,M)
+    print(" ")
+    print("TOP #. Company: #Taxis")
+    f=1
+    for x,y in topM.items():
+            for i in y:
+                print(str(f)+".  "+str(i)+": "+str(x))
+                f+=1
+    
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n>')
@@ -74,6 +104,7 @@ while True:
 
     elif int(inputs[0]) == 2:
         executiontime = timeit.timeit(optionTwo, number=1)
+
         print("Tiempo de ejecución: " + str(executiontime))
 
     elif int(inputs[0]) == 3:
