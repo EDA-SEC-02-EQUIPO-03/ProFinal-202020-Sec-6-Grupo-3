@@ -34,6 +34,7 @@ from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.DataStructures import edge as ed
 from DISClib.Utils import error as error
+import datetime
 assert config
 
 """
@@ -258,6 +259,17 @@ def theBestRoute(graph,station1,station2,timemin,timemax):
 # ==============================
 # Funciones Helper
 # ==============================
+def getDateTimeTaxiTrip(taxitrip):
+    """
+    Recibe la informacion de un servicio de taxi leido del archivo de datos (parametro).
+    Retorna de forma separada la fecha (date) y el tiempo (time) del dato 'trip_start_timestamp'
+    Los datos date se pueden comparar con <, >, <=, >=, ==, !=
+    Los datos time se pueden comparar con <, >, <=, >=, ==, !=
+    """
+    tripstartdate = taxitrip['trip_start_timestamp']
+    taxitripdatetime = datetime.datetime.strptime(tripstartdate, '%Y-%m-%dT%H:%M:%S.%f')
+    return taxitripdatetime.date(), taxitripdatetime.time()
+
 def timechange(hour):
     timehour= int(hour[0,1])*60
     timemin= (int(hour[2,3])//15)*15
