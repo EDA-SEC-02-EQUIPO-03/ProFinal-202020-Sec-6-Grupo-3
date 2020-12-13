@@ -95,8 +95,23 @@ def optionThree():
     
 def optionFour():
     print("\nParte C")
-    station1=int(input("numero de la community area de salida: "))
-    station2=int(input("numero de la community area de destimo: "))
+    print("función para ver el mejor horario y ruta para un viaje entre dos comunity area")
+    station1=input("Escriba el numero de la community area de salida: ")
+    station2=input("Escriba el numero de la community area de destimo: ")
+    timestart=input("Escriba la hora minima que estima para su salida: ")
+    timeend=input("Escriba la hora maxima que estima para su salida: ")
+    result=controller.theBestRoute(analyzer["grafos"],station1,station2,timestart,timeend)
+    print("la mejor hora para salir es :", result[0])
+    print("el camino que se debe seguir es")
+    if result[1] != None:
+        while not(stack.isEmpty(result[1])):
+            station=stack.pop(result[1])
+            vertA=station['vertexA'].split(";;",1)[0]
+            vertB=station['vertexB'].split(";;",1)[0]
+            print(vertA,'->',vertB)
+        print("El tiempo estimado de viaje es: ",result[2])
+    else:
+        print("No existe ruta entre ",station1," y ",station2)
 
 while True:
     printMenu()
@@ -114,6 +129,10 @@ while True:
 
     elif int(inputs[0]) == 3:
         executiontime = timeit.timeit(optionThree, number=1)
+        print("Tiempo de ejecución: " + str(executiontime))
+
+    elif int(inputs[0]) == 4:
+        executiontime = timeit.timeit(optionFour, number=1)
         print("Tiempo de ejecución: " + str(executiontime))
 
     else:

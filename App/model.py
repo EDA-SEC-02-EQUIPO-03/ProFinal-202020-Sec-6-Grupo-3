@@ -96,27 +96,34 @@ def addCompany(theServices,company,taxiID):
 
 def getentry(entry,hour):
     try:
-        Start=entry['pickup_community_area']
-        Finish=entry['dropoff_community_area']
-        timehour= int(hour[0,1])*60
-        timemin= (int(hour[2,3])//15)*15
-        timestamp=timehour+timemin
-        Start_entry=Start+str(timestamp)
-        Finish_entry=Finish+str(timestamp)
-        return Start_entry,Finish_entry
+        
+        Start=entry['pickup_community_area'][:-2]
+        Finish=entry['dropoff_community_area'][:-2]
+        if Start!="" and Finish !="":
+            
+            timehour= int(hour[0:2])*60
+            timemin= (int(hour[3:5])//15)*15
+            timestamp=timehour+timemin
+            
+            Start_entry=Start+";;"+str(timestamp)
+            Finish_entry=Finish+";;"+str(timestamp)
+            return Start_entry,Finish_entry
     except Exception as exp:
         error.reraise(exp, 'model:getentry')
 
 def addgraph(Analyzer,entry):
-    hour=getDateTimeTaxiTrip(entry)[1]
-    entries=getentry(entry,hour)
-    if entry['trip_seconds']!=None:
-        duration=round(int(entry['trip_seconds'])/60,2)
-    if entries[0]!=entries[1]:
+    hour=entry['trip_start_timestamp'][11:]
+   
 
-        addStation(Analyzer,entries[0])
-        addStation(Analyzer,entries[0])
-        addConnection (Analyzer, entries[0], entries[1], duration)
+    entries=getentry(entry,hour)
+    if entry['trip_seconds']!="":
+        duration=float(entry['trip_seconds'])
+        if entries!=None:
+            if entries[0]!=entries[1] :
+                
+                addStation(Analyzer,entries[0])
+                addStation(Analyzer,entries[1])
+                addConnection (Analyzer, entries[0], entries[1], duration)
 
 def addStation(Analyzer, entry):
     """
@@ -135,6 +142,7 @@ def addConnection(Analyzer, origin, destination, duration):
     """
     edge = gr.getEdge(Analyzer['grafos'], origin, destination)
     if edge is None:
+        
         gr.addEdge(Analyzer['grafos'], origin, destination, duration)
     else:
         ed.averageWeight(edge,duration)
@@ -234,25 +242,28 @@ def allTaxisCompanies(theServices):
 def theBestRoute(graph,station1,station2,timemin,timemax):
     best=None
     bestpath=None
-    besttime=100000
+    besttime=100000000
     timemax=timechange(timemax)
     timemin=timechange(timemin)
     i=timemin
     while i<=timemax:
         
-        stationstart=station1+str(i)
-        stationend=station2+str(i)
-        best=djk.Dijkstra(graph,stationstart)
-        wa=djk.pathTo(best,stationend)
-        y=djk.distTo(best,stationend)
-        if wa!=None:
-            if best<=y:
-                besttime=y
-                best =i
-                bestpath= wa
+        stationstart=station1+";;"+str(i)
+        stationend=station2+";;"+str(i)
+        if gr.containsVertex(graph,stationstart):
+            dijk=djk.Dijkstra(graph,stationstart)
+            wa=djk.pathTo(dijk,stationend)
+            y=djk.distTo(dijk,stationend)
+            if wa!=None:
+                if y<=besttime:
+                    besttime=y
+                    best =i
+                    bestpath= wa
         i+=15
-    best=timechangeback(best)
+    if best!=None:
+        best=timechangeback(best)
     way=[best,bestpath,besttime]
+
     return way 
 
 
@@ -271,14 +282,17 @@ def getDateTimeTaxiTrip(taxitrip):
     return taxitripdatetime.date(), taxitripdatetime.time()
 
 def timechange(hour):
-    timehour= int(hour[0,1])*60
-    timemin= (int(hour[2,3])//15)*15
+    timehour= int(hour[0:2])*60
+    timemin= (int(hour[3:5])//15)*15
     timestamp=timehour+timemin
     return timestamp
 def timechangeback(timestamp):
     timehour=timestamp//60
     timemin=timestamp%60
+    
     hour=str(timehour)+":"+str(timemin)
+    if timemin==0:
+        hour=str(timehour)+":"+"00"
     return hour
 # ==============================
 # Funciones de Comparacion
@@ -314,6 +328,6 @@ def comparemaxpq(x1, x2):
     if (x1 == x2):
         return 0
     elif (x1 < x2):
-        return -1
-    else:
         return 1
+    else:
+        return -1

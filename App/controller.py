@@ -63,6 +63,7 @@ def loadData(analyzer, taxisfile):
 
     for taxi in input_file:
         model.addService(analyzer, taxi)
+        model.addgraph(analyzer,taxi)
  
     return analyzer
 
@@ -77,3 +78,5 @@ def topM(analyzer,M):
 
 def allTaxisCompanies(analyzer):
     return model.allTaxisCompanies(analyzer['theServices'])
+def theBestRoute(analyzer,station1,station2,time1,time2):
+    return model.theBestRoute(analyzer,station1,station2,time1,time2)
