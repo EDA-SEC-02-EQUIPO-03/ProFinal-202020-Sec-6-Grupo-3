@@ -157,6 +157,7 @@ def topN(theServices,N):
     valores=[]
     res={}
     i=0
+    n=0
     keys= m.keySet(theServices)
     values=m.valueSet(theServices)
     itv=it.newIterator(values)
@@ -167,12 +168,14 @@ def topN(theServices,N):
         key= it.next(itk)
         if key!= "Independent Owner":
             mpq.insert(orden,value[1])
+
     while i<N:
         valor=mpq.min(orden)
         valores.append(valor)
         res[valor]=[]
         mpq.delMin(orden)
         i+=1
+
     itval=it.newIterator(values)
     itke=it.newIterator(keys)
     while it.hasNext(itval):
@@ -181,31 +184,36 @@ def topN(theServices,N):
         if ke!= "Independent Owner":
             for i in valores:
                 if i==val[1]:
-                    if ke not in res[i]:
+                    if ke not in res[i] and n<N:
                         res[i].append(ke)
+                        n+=1
     return res
 
 def topM(theServices,M):
     valores=[]
     res={}
     i=0
+    n=0
     keys= m.keySet(theServices)
     values=m.valueSet(theServices)
     itv=it.newIterator(values)
     itk=it.newIterator(keys)
     orden=mpq.newMinPQ(comparemaxpq)
+
     while it.hasNext(itv):
         valu=it.next(itv)
         key= it.next(itk)
         value=int(lt.size(valu[0]))
         if key!= "Independent Owner":
             mpq.insert(orden,value)
+
     while i<M:
         valor=mpq.min(orden)
         valores.append(valor)
         res[valor]=[]
         mpq.delMin(orden)
         i+=1
+
     itval=it.newIterator(values)
     itke=it.newIterator(keys)
     while it.hasNext(itval):
@@ -215,8 +223,9 @@ def topM(theServices,M):
         if ke!= "Independent Owner":
             for i in valores:
                 if i==val:
-                    if ke not in res[i]:
+                    if ke not in res[i] and n<M:
                         res[i].append(ke)
+                        n+=1
     return res
 def allTaxisCompanies(theServices):
     taxis= lt.newList('ARRAY_LIST',compare)
